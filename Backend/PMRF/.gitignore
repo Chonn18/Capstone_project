@@ -1,2 +1,7 @@
 *.ckpt
 *.pth
+/data
+/datasets
+/PMRF
+/out
+/checkpoints
