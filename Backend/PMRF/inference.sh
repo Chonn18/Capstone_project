@@ -1,9 +1,6 @@
-#!/bin/bash
-
 python inference.py \
---ckpt_path ohayonguy/PMRF_blind_face_image_restoration \
---ckpt_path_is_huggingface \
---lq_data_path /home/ohayonguy/projects/mmse_rectified_flow/data/celeba_512_validation_lq \
---output_dir ./results_huggingface \
+--ckpt_path /home/duongnhan/Chon/Capstone_project/Backend/PMRF/PMRF/ylzntglb/checkpoints/last.ckpt \
+--lq_data_path /home/duongnhan/Chon/Capstone_project/Backend/PMRF/data/out \
+--output_dir ./out/out_test_1_image \
 --batch_size 64 \
---num_flow_steps 25
+--num_flow_steps 200

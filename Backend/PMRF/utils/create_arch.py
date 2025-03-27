@@ -43,6 +43,22 @@ arch_configs = {
             'mapping_width': 768,
             'dropout_rate': [0, 0],
             'mapping_dropout_rate': 0.0
+        },
+        "Custom": {
+            'in_channels': 3,
+            'out_channels': 3,
+            'widths': [128, 256, 512],   # Giảm chiều rộng
+            'depths': [2, 2, 8],        # Giảm độ sâu
+            'patch_size': [4, 4],       
+            'self_attns': [
+                {"type": "neighborhood", "d_head": 32, "kernel_size": 7},
+                {"type": "neighborhood", "d_head": 32, "kernel_size": 7},
+                {"type": "global", "d_head": 32}
+            ],
+            'mapping_depth': 1,        # Giảm mapping
+            'mapping_width': 512,      
+            'dropout_rate': [0, 0, 0],
+            'mapping_dropout_rate': 0.0
         }
 
     },

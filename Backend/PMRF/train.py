@@ -116,6 +116,7 @@ if __name__ == '__main__':
     parser.add_argument('--arch', type=str, required=True,
                         choices=['hdit_XL2',
                                  'hdit_ImageNet256Sp4',
+                                 'hdit_Custom',
                                  'swinir_M',
                                  'swinir_L'],
                         help='Architecture name and size.')

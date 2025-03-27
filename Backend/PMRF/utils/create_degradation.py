@@ -42,6 +42,15 @@ def create_degradation(degradation):
             partial(torch.clip, min=0, max=1),
             lambda x: (x, None)
         ])
+    
+    elif degradation == 'white_noise_035':  # Thêm nhiễu trắng đen
+        return Compose([
+            partial(add_white_noise, std=0.35),  # Gọi hàm mới để thêm nhiễu trắng đen
+            partial(torch.clip, min=0, max=1),   # Giới hạn giá trị ảnh trong phạm vi [0, 1]
+            partial(torch.squeeze, dim=0),       # Loại bỏ chiều không cần thiết
+            lambda x: (x, None)                  # Trả về ảnh đã biến đổi
+        ])
+
     elif degradation == 'random_inpainting_gaussian_noise_01':
         def inpainting_dps(x):
             total = x.shape[1] ** 2
@@ -142,3 +151,18 @@ def add_gaussian_noise(x, std):
     with torch.no_grad():
         x = x + torch.randn_like(x) * std
         return x
+def add_white_noise(x, std):
+    with torch.no_grad():
+        # Convert to grayscale (average over the color channels)
+        gray_x = torch.mean(x, dim=0, keepdim=True)
+        
+        # Add white noise to the grayscale channel
+        noisy_gray_x = gray_x + torch.randn_like(gray_x) * std
+        
+        # Repeat the noisy grayscale image across the color channels (RGB)
+        noisy_x = noisy_gray_x.repeat(3, 1, 1)
+        
+        # Clip values to stay within the range [0, 1]
+        noisy_x = torch.clip(noisy_x, 0, 1)
+        
+        return noisy_x

@@ -28,6 +28,10 @@ class ImageFolderDataset(Dataset):
         with torch.no_grad():
             img_path = os.path.join(self.root_dir, self.img_file_names[idx])
             x = Image.open(img_path).convert('RGB')
+
+            # Chuyển ảnh thành ảnh trắng đen (grayscale) 
+            x = x.convert('L')  # 'L' là mode cho ảnh xám (grayscale)
+        
             if self.transform:
                 x = self.transform(x)
             y, maybe_x = self.degradation(x)
