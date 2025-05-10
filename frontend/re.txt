@@ -1,0 +1,5 @@
+react-icons
+react-router-dom
+aos
+neo4j-driver 
+react-d3-graph

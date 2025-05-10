@@ -1,0 +1,4 @@
+# Force LF for all files
+* text=auto eol=lf
+
+/Backend/ModelAI/InvSR/weights 
