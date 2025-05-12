@@ -1,11 +1,13 @@
-import React, { useState } from "react";
-import botImage from '../../assets/bot.png'
+import React from "react";
+import { Link } from "react-router-dom"; // Dùng nếu bạn dùng React Router
+import logo from '../../assets/logo_notext.png';
+import logoText from '../../assets/logo_text.png';
 
 export const Navlinks = [
   {
     id: 1,
     name: "HOME",
-    link: "/landing",
+    link: "/",
   },
   {
     id: 2,
@@ -14,44 +16,42 @@ export const Navlinks = [
   },
   {
     id: 3,
-    name: "Login",
+    name: "main",
     link: "/login",
   },
 ];
+
 const Navbar = () => {
-  
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-10 shadow-md w-full dark:bg-black dark:text-white duration-300
-    "
-    style={{ backgroundColor: '#FFFFFF' }}
+      className="fixed top-0 left-0 right-0 z-10 shadow-md w-full bg-white dark:bg-black dark:text-white duration-300"
     >
-      <div className="container py-2 md:py-0">
-        <div className="flex justify-between items-center">
-          <div className="flex flex-row justify-between items-center px-8 mr-6">
-            {/* <a href={'/'} className="text-3xl font-bold font-serif">CCHQ</a> */}
-            <img src={botImage} className='w-10 '></img>
-            <h1 className="font-bold text-sky-800 px-4">CTGenix</h1>
-          </div>
-          <nav className="hidden md:block">
-            <ul className="flex items-center gap-8">
-              {Navlinks.map(({ id, name, link }) => (
-                <li key={id} className="py-3 text-sky-900 hover:text-sky-500">
-                  <a
-                    href={link}
-                    className=" text-lg font-medium  hover:text-primary py-2 hover:border-b-2 hover:border-primary transition-colors duration-500  "
-                  >
-                    {name}
-                  </a>
-                </li>
-              ))}
-              
-            </ul>
-          </nav>
-          
+      <div className="w-full mx-auto px-12 h-fit flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex items-center gap-3 py-1">
+          <img src={logo} className=" h-24 w-auto " alt="CTGenix Logo" />
+          <img src={logoText} className=" h-11 w-auto mt-8 -ml-4" alt="CTGenix Text" />
+          {/* <h1 className="font-bold text-sky-800 text-4xl">CTGenix</h1> */}
         </div>
+
+        {/* Navigation Links */}
+        <nav className="hidden md:block">
+          <ul className="flex items-center gap-8">
+            {Navlinks.map(({ id, name, link }) => (
+              <li key={id} className=" ">
+                <Link
+                  to={link}
+                  className=" text-headercolor text-3xl font-bold hover:text-texthover py-2 px-2 hover:border-b-2 hover:texthover transition-all duration-300"
+                >
+                  {name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
     </div>
+
   );
 };
 

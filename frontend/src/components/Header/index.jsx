@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import botImage from '../../assets/bot.png'
+import logo from '../../assets/logo_v2.png'
 
 
 
@@ -10,7 +10,7 @@ const Header = () => {
       {/* Header */}
         <div className="flex justify-between items-center">
           <div className="flex flex-row justify-between items-center px-8 mr-6 py-2">
-            <img src={botImage} className='w-10 '></img>
+            <img src={logo} className='w-10 '></img>
             <h1 className="font-bold text-sky-800 px-4">CTGenix</h1>
           </div>
           

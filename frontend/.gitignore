@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+src/pages/About/
+src/pages/Chat/
+src/pages/Home/
+src/pages/Import/
+src/pages/Visualization/

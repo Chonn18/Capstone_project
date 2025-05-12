@@ -18,11 +18,11 @@ const Landing = () => {
       easing: "ease-in-sine",
       delay: 100,
     });
-    AOS.refresh();
+    // AOS.refresh();
   }, []);
  
   return (
-    <div className="bg-white dark:bg-black dark:text-white text-black overflow-x-hidden p-4">
+    <div className="w-full bg-white dark:bg-black dark:text-white text-black overflow-x-hidden p-4 justify-center">
       <Navbar  />
       <Hero  />
       <About />
