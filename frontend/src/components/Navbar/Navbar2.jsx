@@ -12,14 +12,14 @@ export const Navlinks = [
   {
     id: 2,
     name: "ABOUT",
-    link: "/#about",
+    link: "/result",
   },
 ];
 
 const Navbar2 = () => {
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-10 shadow-md w-full bg-white dark:bg-black dark:text-white duration-300"
+      className="fixed top-0 left-0 right-0 z-10 shadow-md w-full bg-white dark:bg-black dark:text-white duration-300 py-2"
     >
       <div className="w-full mx-auto px-12 h-fit flex items-center justify-between">
         {/* Logo */}
