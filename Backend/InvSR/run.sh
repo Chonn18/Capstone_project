@@ -1,0 +1,1 @@
+python inference_invsr.py -i '/home/duongnhan/Chon/Capstone_project/Backend/MWFormer/results/pred0.png' -o './out' --num_steps 1 --bs 1 --chopping_bs 2

@@ -1,0 +1,1 @@
+python test.py -restore-from-stylefilter /home/duongnhan/Chon/MWFormer/ckpt/lan4/finetune/finetune3/style_best_all -restore-from-backbone /home/duongnhan/Chon/MWFormer/ckpt/lan4/finetune/finetune3/finetune4_3190000.pth -val_data_dir /home/duongnhan/Chon/Capstone_project/Backend/ModelAI/MWFormer/data/CT_test/ -val_filename /CT.txt 

@@ -3,12 +3,15 @@ import logo from "../../assets/logo_notext.png";
 import Nav from "../../components/Navbar/Navbar2";
 import Footer from "../../components/Footer/Footer";
 import API from "../../API";
+import { useNavigate } from "react-router-dom"; 
+
 
 const Denoise = () => {
 const [imageURL, setImageURL] = useState("");
 const [preview, setPreview] = useState(null);
 const [isLoading, setIsLoading] = useState(false);
 const fileInputRef = useRef(null);
+const navigate = useNavigate();
 
 useEffect(() => {
     if (imageURL && imageURL.startsWith("http")) {
@@ -57,7 +60,9 @@ const handleDrop = (e) => {
 //   };
 
 const handleDenoise = async () => {
-    if (!preview) {
+    const file = fileInputRef.current?.files[0];
+
+    if (!file) {
         alert("Please upload an image.");
         return;
     }
@@ -65,33 +70,34 @@ const handleDenoise = async () => {
     setIsLoading(true);
 
     try {
-    const formData = new FormData();
-    formData.append("file", fileInputRef.current.files[0]);
+        const formData = new FormData();
+        formData.append("file", file);                
+        formData.append("filename", file.name);       
 
-    const response = await API.post("/denoise", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        responseType: "json", // dùng json nếu ảnh là base64
-    });
-
-    if (response.status === 200) {
-        const { image_base64, info } = response.data;
-
-        // Chuyển sang trang /result với dữ liệu
-        navigate("/result", {
-        state: {
-            resultImage: `data:image/png;base64,${image_base64}`,
-            info,
-        },
+        const response = await API.post("/denoise-image/", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+            responseType: "json",
         });
-    }
-    } catch (error) {
-    console.error("Error sending image:", error);
-    alert("Failed to denoise image.");
-    } finally {
-    setIsLoading(false);
-    }
 
+        if (response.status === 200) {
+            const { image_base64, psnr, ssim } = response.data;
+
+            // Chuyển cả ảnh gốc và ảnh kết quả sang /result
+            navigate("/result", {
+                state: {
+                    originalImage: URL.createObjectURL(file), 
+                    resultImage: `data:image/png;base64,${image_base64}`
+                },
+            });
+        }
+    } catch (error) {
+        console.error("Error sending image:", error);
+        alert("Failed to denoise image.");
+    } finally {
+        setIsLoading(false);
+    }
 };
+
 
 
   return (

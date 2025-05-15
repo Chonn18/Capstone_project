@@ -1,27 +1,124 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
+import shutil
+import os
+import torch
+from rundenoise import run_denoise
+from runSR import runSR
+import argparse
 from PIL import Image
 import io
+import base64
 
+
+def save_iamge(image, ten_file=None):
+    # Tạo thư mục nếu chưa có
+    os.makedirs('./uploads/run/input', exist_ok=True)
+    os.makedirs('./uploads/run/gt', exist_ok=True)
+
+    # Tạo tên file nếu không có (dựa trên thời gian)
+    if ten_file is None:
+        # ten_file = datetime.now().strftime("image_%Y%m%d_%H%M%S.png")
+        ten_file = "anhtest.png"
+    path_in = "./uploads/run/input"
+    # Đường dẫn lưu ảnh
+    duong_dan_input = os.path.join('./uploads/run/input', ten_file)
+    duong_dan_gt = os.path.join('./uploads/run/gt', ten_file)
+
+    # Lưu ảnh vào cả 2 thư mục
+    image.save(duong_dan_input)
+    image.save(duong_dan_gt)
+
+    # Ghi đường dẫn vào file ten.txt
+    with open('./uploads/run/ten.txt', 'a', encoding='utf-8') as f:
+        f.write(f"/input/{ten_file}\n")
+
+    # return 
+
+# Khởi tạo ứng dụng FastAPI
 app = FastAPI()
 
-# Allow frontend (e.g., http://localhost:5173)
+# origins = [
+#     "http://localhost",
+#     "http://localhost:8000",
+#     "http://localhost:5173",
+# ]
+
+origins = ["*"]
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # or specific origin
+    allow_origins = origins, 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.post("/process-image/")
-async def process_image(file: UploadFile = File(...)):
-    image = Image.open(io.BytesIO(await file.read()))
-    # 🧪 Example: Convert to grayscale
-    image = image.convert("L")
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
 
-    img_byte_arr = io.BytesIO()
-    image.save(img_byte_arr, format='PNG')
-    img_byte_arr.seek(0)
 
-    # return StreamingResponse(img_byte_arr, media_type="image/png")
+# Định nghĩa một POST endpoint cho việc xử lý ảnh
+@app.post("/denoise-image/")
+async def denoise_image(
+    file: UploadFile = File(...),
+    filename: str = Form(...)
+):
+    try:
+        # Mở và lưu ảnh với tên đã nhận
+        image = Image.open(file.file)
+        image_input_path = os.path.join("./uploads/run/input", filename)
+        image_gt_path = os.path.join("./uploads/run/gt", filename)
+        image.save(image_input_path)
+        image.save(image_gt_path)
+
+        # Ghi tên file vào ten.txt
+        with open("./uploads/run/ten.txt", "w", encoding="utf-8") as f:
+            f.write(f"/input/{filename}\n")
+
+        # Chạy xử lý denoise
+        # args_denoise = get_parser_denoise()
+        data_dir = './uploads/run/input/'
+        textfile = 'ten.txt'
+        pred_image = run_denoise(val_data_dir=data_dir, val_filename=textfile)
+        image_result = pred_image
+        # Đọc kết quả ảnh đã xử lý
+        # result_path = os.path.join("./results/denoise", filename)
+        # image_result = Image.open(result_path)
+
+        # Chuyển ảnh sang base64
+        buffered = io.BytesIO()
+        image_result.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+        return {
+            "message": "Image denoising completed successfully",
+            "image_base64": img_str,
+            # "psnr": psnr,
+            # "ssim": ssim
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.post("/imageSR/")
+async def SRimg(
+    file: UploadFile = File(...),
+    filename: str = Form(...)
+):
+    try:
+        # Mở và lưu ảnh với tên đã nhận
+        image = Image.open(file.file)
+        
+
+        # return {
+        #     "message": "Image denoising completed successfully",
+        #     "image_base64": img_str,
+        # }
+
+    except Exception as e:
+        return {"error": str(e)}
+

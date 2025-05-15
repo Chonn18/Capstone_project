@@ -1,0 +1,1 @@
+python main_train_style.py -file-name EXP1_2

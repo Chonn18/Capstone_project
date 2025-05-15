@@ -1,0 +1,8 @@
+/input/ID_0001_g1.jpg
+/input/ID_0001_g2.jpg
+/input/ID_0001_g3.jpg
+/input/ID_0001_g4.jpg
+/input/ID_0002_g1.jpg
+/input/ID_0002_g2.jpg
+/input/ID_0002_g3.jpg
+/input/ID_0002_g4.jpg

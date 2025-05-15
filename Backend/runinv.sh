@@ -1,0 +1,1 @@
+python runinv.py -i '/home/duongnhan/Chon/Capstone_project/Backend/ModelAI/MWFormer/results/pred0.png' -o './uploads' --num_steps 1 --bs 1 --chopping_bs 2
