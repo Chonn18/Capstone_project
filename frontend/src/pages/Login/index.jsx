@@ -4,11 +4,11 @@ import Img from "../../assets/login.png";
 import { toaster } from "../../components/ui/toaster"
 import Navbar from "../../components/Navbar/Navbar";
 import API from "../../API";
-import { useUser } from "../../context/UserContext";
+// import { useUser } from "../../context/UserContext";
 // import Footer from "../components/Footer/Footer";
 
 const Login = () => {
-    const {setUser, login} = useUser()
+    // const {setUser, login} = useUser()
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
