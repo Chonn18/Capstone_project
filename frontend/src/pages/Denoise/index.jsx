@@ -5,108 +5,87 @@ import Footer from "../../components/Footer/Footer";
 import API from "../../API";
 import { useNavigate } from "react-router-dom"; 
 
-
 const Denoise = () => {
-const [imageURL, setImageURL] = useState("");
-const [preview, setPreview] = useState(null);
-const [isLoading, setIsLoading] = useState(false);
-const fileInputRef = useRef(null);
-const navigate = useNavigate();
+  const [imageURL, setImageURL] = useState("");
+  const [preview, setPreview] = useState(null);
+  const [file, setFile] = useState(null); // Thêm state lưu file
+  const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
-useEffect(() => {
+  useEffect(() => {
     if (imageURL && imageURL.startsWith("http")) {
-        setPreview(imageURL);
+      setPreview(imageURL);
     }
-    }, [imageURL]);
+  }, [imageURL]);
 
-const handleFile = (file) => {
+  const handleFile = (file) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-        setPreview(reader.result);
-        setImageURL("");
+      setPreview(reader.result);
+      setImageURL("");
     };
     reader.readAsDataURL(file);
-};
 
-const handleFileUpload = (e) => {
+    setFile(file); // Lưu file vào state
+  };
+
+  const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) handleFile(file);
-};
+  };
 
-const handleDragOver = (e) => {
+  const handleDragOver = (e) => {
     e.preventDefault();
-};
+  };
 
-const handleDrop = (e) => {
+  const handleDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) handleFile(file);
-};
+  };
 
-//   const handleDenoise = () => {
-//     const source = preview || imageURL;
-//     if (!source) {
-//       alert("Please upload an image or paste a valid image URL.");
-//       return;
-//     }
-//     setIsLoading(true);
-//     console.log("Denoising image from:", source);
-
-//     // Simulate API call
-//     setTimeout(() => {
-//       setIsLoading(false);
-//       alert("Denoising complete! (fake)");
-//     }, 3000);
-//   };
-
-const handleDenoise = async () => {
-    const file = fileInputRef.current?.files[0];
-
+  const handleDenoise = async () => {
     if (!file) {
-        alert("Please upload an image.");
-        return;
+      alert("Please upload an image.");
+      return;
     }
 
     setIsLoading(true);
 
     try {
-        const formData = new FormData();
-        formData.append("file", file);                
-        formData.append("filename", file.name);       
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("filename", file.name);
 
-        const response = await API.post("/denoise-image/", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-            responseType: "json",
+      const response = await API.post("/denoise-image/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        responseType: "json",
+      });
+
+      if (response.status === 200) {
+        const { image_base64, psnr, ssim } = response.data;
+
+        navigate("/result", {
+          state: {
+            originalImage: URL.createObjectURL(file),
+            resultImage: `data:image/png;base64,${image_base64}`,
+          },
         });
-
-        if (response.status === 200) {
-            const { image_base64, psnr, ssim } = response.data;
-
-            // Chuyển cả ảnh gốc và ảnh kết quả sang /result
-            navigate("/result", {
-                state: {
-                    originalImage: URL.createObjectURL(file), 
-                    resultImage: `data:image/png;base64,${image_base64}`
-                },
-            });
-        }
+      }
     } catch (error) {
-        console.error("Error sending image:", error);
-        alert("Failed to denoise image.");
+      console.error("Error sending image:", error);
+      alert("Failed to denoise image.");
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-};
-
-
+  };
 
   return (
     <div>
-        
       <Nav />
-      
+
       <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-16 mt-6">
-        
         <div className="w-full max-w-[1400px] grid md:grid-cols-[1fr_1.5fr] gap-16 items-center">
           {/* Left */}
           <div className="w-full">
@@ -119,7 +98,7 @@ const handleDenoise = async () => {
 
           {/* Right */}
           <div className="relative bg-white p-8 rounded-2xl border border-gray-300 shadow-xl text-center w-full min-h-[550px] flex flex-col justify-start items-center overflow-hidden">
-            
+
             {/* Overlay Loading Spinner */}
             {isLoading && (
               <div className="absolute inset-0 bg-white/80 z-20 flex flex-col items-center justify-center">
@@ -135,6 +114,7 @@ const handleDenoise = async () => {
                   onClick={() => {
                     setPreview(null);
                     setImageURL("");
+                    setFile(null); // Reset file khi xóa ảnh preview
                   }}
                   className="absolute top-2 right-2 bg-white/70 hover:bg-red-500 text-gray-800 hover:text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg backdrop-blur transition z-10"
                   title="Remove Image"
@@ -197,12 +177,8 @@ const handleDenoise = async () => {
                     className="w-full px-5 py-3 outline-none text-gray-700 text-xl"
                   />
                 </div>
-
-                {/* DENOISE button */}
-                
               </>
             )}
-            
           </div>
         </div>
       </div>
@@ -212,3 +188,4 @@ const handleDenoise = async () => {
 };
 
 export default Denoise;
+     
