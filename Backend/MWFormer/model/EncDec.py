@@ -703,7 +703,8 @@ class DecoderTransformer(nn.Module):
             dim=embed_dims[3], num_heads=num_heads[3], mlp_ratio=mlp_ratios[3], qkv_bias=qkv_bias, qk_scale=qk_scale,
             drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[cur + i], norm_layer=norm_layer,
             sr_ratio=sr_ratios[3])
-            for i in range(depths[1])])
+            # thay doi so lop  
+            for i in range(depths[1])]) # depth0 = 3, depth1 = 44
         self.norm1 = norm_layer(embed_dims[3])
 
         cur += depths[0]

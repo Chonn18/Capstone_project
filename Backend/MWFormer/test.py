@@ -10,8 +10,8 @@ from val_data_functions import ValData
 from utils_val import validation_stylevec, validation_stylevec2 
 import numpy as np
 import random
-from model.EncDec import Network_top    #default
-from model.style_filter64 import StyleFilter_Top
+from model.EncDec_3 import Network_top    #default
+from model.style_filter64_3 import StyleFilter_Top
 
 
 # --- Parse hyper-parameters  --- #
