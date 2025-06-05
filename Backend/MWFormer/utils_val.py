@@ -215,6 +215,19 @@ def bgr2ycbcr(img, y_only=True):
     return out_img
 
 
+def save_images(pred_image, gt, original_name, path_save):
+    # Tạo thư mục nếu chưa có
+    os.makedirs(os.path.join(path_save, 'input'), exist_ok=True)
+    os.makedirs(os.path.join(path_save, 'gt'), exist_ok=True)
+
+    # Lưu ảnh
+    cv2.imwrite(os.path.join(path_save, 'input', original_name), pred_image)
+    cv2.imwrite(os.path.join(path_save, 'gt', original_name), gt)
+
+    # Ghi đường dẫn vào CT.txt
+    with open(os.path.join(path_save, 'CT.txt'), 'a') as f:
+        f.write(f'/input/{original_name}\n')
+
 def validation_stylevec(style_filter, net:torch.nn.Module, val_data_loader1, device):
     print("Start Val")
     psnr_list = []
@@ -245,7 +258,13 @@ def validation_stylevec(style_filter, net:torch.nn.Module, val_data_loader1, dev
         pred_image = pred_image.squeeze(0)
         pred_image = 255*pred_image.clamp(0,255).cpu().numpy()
         pred_image = cv2.cvtColor(pred_image, cv2.COLOR_RGB2BGR)
-        output_path = './results/pred' + str(batch_id) + '.png'
+        # output_path = './results/pred' + str(batch_id) + '.png'
+        filename = imgname[0]
+        filename = filename.split('/')[-1]  
+        original_name = filename.split('.')[0]
+        # print(original_name)
+        output_path = f'/home/duongnhan/Chon/Capstone_project/Backend/results/denoise/{filename}'
+        # Lưu ảnh
         cv2.imwrite(output_path, pred_image)
         if batch_id==60:
            break
@@ -254,8 +273,6 @@ def validation_stylevec(style_filter, net:torch.nn.Module, val_data_loader1, dev
 
 def validation_stylevec2(style_filter, net: torch.nn.Module, val_data_loader1, device):
     print("Start Val")
-    psnr_list = []
-    ssim_list = []
     name_list = []
     for batch_id, test_data in enumerate(tqdm(val_data_loader1)):
 
@@ -271,10 +288,6 @@ def validation_stylevec2(style_filter, net: torch.nn.Module, val_data_loader1, d
 
         gt = gt[0].permute(1, 2, 0)
         pred_image = pred_image[0].permute(1, 2, 0)
-        psnr = calculate_psnr(255 * gt, 255 * pred_image.clamp(0, 1)).item()
-        ssim = calculate_ssim(255 * gt, 255 * pred_image.clamp(0, 1)).item()
-        psnr_list.append(psnr)
-        ssim_list.append(ssim)
         name_list.append(imgname)
 
         # Lưu ảnh với tên gốc của ảnh
@@ -288,14 +301,15 @@ def validation_stylevec2(style_filter, net: torch.nn.Module, val_data_loader1, d
         filename = filename.split('/')[-1]  
         original_name = filename.split('.')[0]
         # print(original_name)
-        output_path = f'./results/denoise/{original_name}.png'
+        output_path = f'/home/duongnhan/Chon/Capstone_project/Backend/results/denoise/{original_name}.png'
         # Lưu ảnh
         cv2.imwrite(output_path, pred_image)
 
         if batch_id == 60:
             break
+    # output_path
 
-    return sum(psnr_list) / len(psnr_list), sum(ssim_list) / len(ssim_list)
+    return output_path
 
 def validation_stylevec3(style_filter, net: torch.nn.Module, val_data_loader1, device):
     print("Start Val")
@@ -337,6 +351,50 @@ def validation_stylevec3(style_filter, net: torch.nn.Module, val_data_loader1, d
 
     # return name_list
     return  pred_image
+
+def validation_stylevec_savef(style_filter, net:torch.nn.Module, val_data_loader1, device, save_path):
+    print("Start Val")
+    psnr_list = []
+    ssim_list = []
+    name_list = []
+    for batch_id, test_data in  enumerate(tqdm(val_data_loader1)):
+
+        input_image, gt, imgname = test_data
+        input_image = input_image.to(device)
+        gt = gt.to(device)
+
+
+        # --- Forward + Backward + Optimize --- #
+        style_filter.eval()
+        net.eval()
+        feature_vec = style_filter(input_image)
+        pred_image = net(input_image,feature_vec)
+
+        gt = gt[0].permute(1,2,0)
+        pred_image = pred_image[0].permute(1,2,0)
+        psnr = calculate_psnr(255*gt, 255*pred_image.clamp(0,1)).item()
+        ssim = calculate_ssim(255*gt, 255*pred_image.clamp(0,1)).item()
+        psnr_list.append(psnr)
+        ssim_list.append(ssim)
+        name_list.append(imgname)
+
+        #save
+        pred_image = pred_image.squeeze(0)
+        pred_image = 255*pred_image.clamp(0,255).cpu().numpy()
+        pred_image = cv2.cvtColor(pred_image, cv2.COLOR_RGB2BGR)
+        
+        gt = gt.squeeze(0)
+        gt = 255*gt.clamp(0,255).cpu().numpy()
+        gt = cv2.cvtColor(gt, cv2.COLOR_RGB2BGR)
+
+        filename = imgname[0]
+        filename = filename.split('/')[-1]  
+        original_name = filename.split('.')[0]
+
+        save_images(pred_image, gt, filename, save_path)
+        if batch_id==60:
+           break
+    return sum(psnr_list)/len(psnr_list), sum(ssim_list)/len(ssim_list)
 
 
 #test unpaired data using the proposed model (without ground truth)
