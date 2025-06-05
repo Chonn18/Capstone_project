@@ -1,5 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import shutil
 import os
 import torch
@@ -50,11 +52,19 @@ origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins = origins, 
+    allow_origins = origins, 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Gắn static frontend đã build
+app.mount("/frontend", StaticFiles(directory="frontend_dist", html=True), name="frontend")
+
+# Route để trả về index.html nếu truy cập gốc frontend
+@app.get("/frontend/")
+def serve_frontend():
+    return FileResponse("frontend_dist/index.html")
+
 
 @app.get("/")
 def read_root():
