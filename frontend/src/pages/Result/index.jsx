@@ -13,7 +13,7 @@ const Result = () => {
     // Nhận ảnh gốc và ảnh kết quả từ state
     const originalImage = state?.originalImage || "../../assets/gt.jpg"; 
     const resultImage = state?.resultImage || "../../assets/pred.png";   
-    const info = state?.info;
+    const fileName = state?.fileName;
 
     const [fullscreenImage, setFullscreenImage] = useState(null);
 
@@ -59,26 +59,26 @@ const Result = () => {
                         />
 
                         {/* Download Button */}
-                        <div className="flex justify-center mt-6">
+                        {/* <div className="flex justify-center mt-6">
                             <a
                                 href={resultImage}
-                                download="denoised_image.png"
+                                download = {`denoised_${fileName}`}
                                 className="px-6 py-2 bg-headercolor text-white rounded-lg hover:bg-opacity-80 transition text-lg"
                             >
                                 ⬇ Download Image
                             </a>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 
                 {/* Metadata */}
-                {info && (
+                {/* {info && (
                     <div className="mt-10 text-gray-700 text-lg bg-gray-50 rounded-lg p-4 border">
                         <p><strong>Filename:</strong> {info.filename}</p>
                         <p><strong>Size:</strong> {info.size[0]} × {info.size[1]} px</p>
                         <p><strong>Processing time:</strong> {info.processing_time} sec</p>
                     </div>
-                )}
+                )} */}
             </div>
 
             <Footer />
