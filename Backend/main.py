@@ -41,14 +41,7 @@ def save_iamge(image, ten_file=None):
 # Khởi tạo ứng dụng FastAPI
 app = FastAPI()
 
-# origins = [
-#     "http://localhost",
-#     "http://localhost:8000",
-#     "http://localhost:5173",
-# ]
-
 origins = ["*"]
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -58,17 +51,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 # Gắn static frontend đã build
-app.mount("/frontend", StaticFiles(directory="frontend_dist", html=True), name="frontend")
+app.mount("/", StaticFiles(directory="frontend_dist", html=True), name="static")
 
-# Route để trả về index.html nếu truy cập gốc frontend
-@app.get("/frontend/")
-def serve_frontend():
+# Trả index.html nếu truy cập '/'
+@app.get("/")
+def serve_root():
     return FileResponse("frontend_dist/index.html")
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+# @app.get("/")
+# def read_root():
+#     return {"Hello": "World"}
 
 @app.post("/testSend/")
 async def testSend(
@@ -190,21 +183,23 @@ async def denoise_image(
         return {"error": str(e)}
 
 
-@app.post("/imageSR/")
-async def SRimg(
-    file: UploadFile = File(...),
-    filename: str = Form(...)
-):
-    try:
-        # Mở và lưu ảnh với tên đã nhận
-        image = Image.open(file.file)
+# @app.post("/imageSR/")
+# async def SRimg(
+#     file: UploadFile = File(...),
+#     filename: str = Form(...)
+# ):
+#     try:
+#         # Mở và lưu ảnh với tên đã nhận
+#         image = Image.open(file.file)
         
 
-        # return {
-        #     "message": "Image denoising completed successfully",
-        #     "image_base64": img_str,
-        # }
+#         # return {
+#         #     "message": "Image denoising completed successfully",
+#         #     "image_base64": img_str,
+#         # }
 
-    except Exception as e:
-        return {"error": str(e)}
+#     except Exception as e:
+#         return {"error": str(e)}
 
+# uvicorn main:app --host 0.0.0.0 --port 8080
+# ngrok http 8080
