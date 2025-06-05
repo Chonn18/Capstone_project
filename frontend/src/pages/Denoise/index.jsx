@@ -9,6 +9,7 @@ const Denoise = () => {
   const [imageURL, setImageURL] = useState("");
   const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null); // Thêm state lưu file
+  const [fileURL, setFileURL] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
@@ -45,8 +46,26 @@ const Denoise = () => {
     if (file) handleFile(file);
   };
 
+
+  const fetchImageAsFile = async (url) => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    const ext = blob.type.split("/")[1] || "png";
+    const name = generateRandomFileName(ext);
+
+    return new File([blob], name, { type: blob.type });
+  };
+
+
+  const generateRandomFileName = (ext = "png") => {
+    const randomStr = Math.random().toString(36).substring(2, 10);
+    return `img_${randomStr}.${ext}`;
+  };
+
+
   const handleDenoise = async () => {
-    if (!file) {
+    if (!file && !imageURL) {
       alert("Please upload an image.");
       return;
     }
@@ -54,25 +73,54 @@ const Denoise = () => {
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("filename", file.name);
+      if (!file && imageURL){
+        let fileToSend = file;
+        fileToSend = await fetchImageAsFile(imageURL);
+        const formData = new FormData();
+        formData.append("file", fileToSend);
+        formData.append("filename", fileToSend.name);
 
-      const response = await API.post("/denoise-image/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        responseType: "json",
-      });
-
-      if (response.status === 200) {
-        const { image_base64, psnr, ssim } = response.data;
-
-        navigate("/result", {
-          state: {
-            originalImage: URL.createObjectURL(file),
-            resultImage: `data:image/png;base64,${image_base64}`,
-          },
+        const response = await API.post("/denoise-image/", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+          responseType: "json",
         });
+
+        if (response.status === 200) {
+          const { image_base64 } = response.data;
+
+          navigate("/result", {
+            state: {
+              originalImage: URL.createObjectURL(fileToSend),
+              resultImage: `data:image/png;base64,${image_base64}`,
+              fileName: fileToSend.name,
+            },
+          });
+        }
       }
+
+      else{
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("filename", file.name);
+
+        const response = await API.post("/denoise-image/", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+          responseType: "json",
+        });
+
+        if (response.status === 200) {
+          const { image_base64 } = response.data;
+
+          navigate("/result", {
+            state: {
+              originalImage: URL.createObjectURL(file),
+              resultImage: `data:image/png;base64,${image_base64}`,
+              fileName: file.name,
+            },
+          });
+        }
+      }
+      
     } catch (error) {
       console.error("Error sending image:", error);
       alert("Failed to denoise image.");

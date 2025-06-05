@@ -14,11 +14,11 @@ export const Navlinks = [
     name: "ABOUT",
     link: "/#about",
   },
-  {
-    id: 3,
-    name: "main",
-    link: "/login",
-  },
+  // {
+  //   id: 3,
+  //   name: "main",
+  //   link: "/login",
+  // },
 ];
 
 const Navbar = () => {
