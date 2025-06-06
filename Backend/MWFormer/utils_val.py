@@ -311,7 +311,7 @@ def validation_stylevec2(style_filter, net: torch.nn.Module, val_data_loader1, d
 
     return output_path
 
-def validation_stylevec3(style_filter, net: torch.nn.Module, val_data_loader1, device):
+def validation_stylevec3(style_filter, net: torch.nn.Module, val_data_loader1, device, savepath):
     print("Start Val")
 
     name_list = []
@@ -340,9 +340,9 @@ def validation_stylevec3(style_filter, net: torch.nn.Module, val_data_loader1, d
         # print(imgname)
         filename = imgname[0]
         filename = filename.split('/')[-1]  
-        original_name = filename.split('.')[0]
+        # original_name = filename.split('.')[0]
+        output_path = os.path.join(savepath,filename)
         # print(original_name)
-        output_path = f'./results/denoise/{original_name}.png'
         # Lưu ảnh
         cv2.imwrite(output_path, pred_image)
 
@@ -350,7 +350,7 @@ def validation_stylevec3(style_filter, net: torch.nn.Module, val_data_loader1, d
             break
 
     # return name_list
-    return  pred_image
+    return  output_path
 
 def validation_stylevec_savef(style_filter, net:torch.nn.Module, val_data_loader1, device, save_path):
     print("Start Val")

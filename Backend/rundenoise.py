@@ -37,6 +37,7 @@ def run_denoise(
     restore_from_backbone='/home/duongnhan/Chon/MWFormer/ckpt/lan4/finetune/finetune3/finetune4_3190000.pth',
     val_data_dir='/home/duongnhan/Chon/Capstone_project/Backend/MWFormer/data/bew/',
     val_filename='CT.txt',
+    save_path = ''
 ):
     # Set seed
     if seed is not None:
@@ -79,7 +80,7 @@ def run_denoise(
     StyleFilter.eval()
 
     with torch.no_grad():
-        pred_image = validation_stylevec2(StyleFilter, net, val_data_loader, device)
+        pred_image = validation_stylevec3(StyleFilter, net, val_data_loader, device, save_path)
 
     return pred_image
 

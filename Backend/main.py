@@ -50,7 +50,7 @@ origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins = origins, 
+    allow_origins = origins, 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -100,6 +100,7 @@ async def denoise_image(
         save_dir = f'/home/duongnhan/Chon/Capstone_project/Backend/uploads/result/{session_id}/'
         os.makedirs(os.path.join(up_dir, 'input'), exist_ok=True)
         os.makedirs(os.path.join(up_dir, 'gt'), exist_ok=True)
+        # os.makedirs(save_dir, exist_ok=True)
         # Mở và lưu ảnh với tên đã nhận
         image = Image.open(file.file)
 
@@ -112,7 +113,7 @@ async def denoise_image(
         with open(os.path.join(up_dir, "CT.txt"), "w", encoding="utf-8") as f:
             f.write(f"/input/{filename}\n")
         textfile = '/CT.txt'
-        pred_image = run_denoise(val_data_dir=up_dir, val_filename=textfile)
+        pred_image = run_denoise(val_data_dir=up_dir, val_filename=textfile, save_path = up_dir)
         # image_result = pred_image
         # Đọc kết quả ảnh đã xử lý
         # result_path = os.path.join("./results/denoise", filename)
