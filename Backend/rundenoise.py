@@ -16,27 +16,15 @@ import sys
 # Thêm thư mục MWFormer vào sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'MWFormer')))
 
-# def get_parser_denoise(**parser_kwargs):
-#     parser = argparse.ArgumentParser(**parser_kwargs)
-#     parser = argparse.ArgumentParser(description='Hyper-parameters for network')
-#     parser.add_argument('-val_batch_size', help='Set the validation/test batch size', default=1, type=int)
-#     parser.add_argument('-seed', help='set random seed', default=19, type=int)
-#     parser.add_argument("-restore-from-stylefilter", help='the weights of feature extraction network', type=str, default='/home/duongnhan/Chon/MWFormer/ckpt/lan4/finetune/finetune3/style_best_all')
-#     parser.add_argument('-restore-from-backbone', help='the weights of the image restoration backbone', default='/home/duongnhan/Chon/MWFormer/ckpt/lan4/finetune/finetune3/finetune4_3190000.pth', type=str)     
-#     parser.add_argument('-val_data_dir', default='/home/duongnhan/Chon/Capstone_project/Backend/MWFormer/data/bew/', type=str)  # Chỉ đường dẫn đến thư mục upload ảnh
-#     parser.add_argument('-val_filename', default='CT.txt', type=str)  # Sử dụng tên file của ảnh vừa tải lên
-
-#     args = parser.parse_args()
-#     return args
-
 
 def run_denoise(
     val_batch_size=1,
     seed=19,
-    restore_from_stylefilter='/home/duongnhan/Chon/MWFormer/ckpt/lan4/finetune/finetune3/style_best_all',
-    restore_from_backbone='/home/duongnhan/Chon/MWFormer/ckpt/lan4/finetune/finetune3/finetune4_3190000.pth',
+    restore_from_stylefilter='/home/duongnhan/Chon/MWFormer/ckpt/lan4/finetune/finetuneLDCT_2/style_best_all',
+    restore_from_backbone='/home/duongnhan/Chon/MWFormer/ckpt/lan4/finetune/finetuneLDCT_2/finetune4_LDCT80000.pth',
     val_data_dir='/home/duongnhan/Chon/Capstone_project/Backend/MWFormer/data/bew/',
     val_filename='CT.txt',
+    save_path = ''
 ):
     # Set seed
     if seed is not None:
@@ -79,7 +67,7 @@ def run_denoise(
     StyleFilter.eval()
 
     with torch.no_grad():
-        pred_image = validation_stylevec2(StyleFilter, net, val_data_loader, device)
+        pred_image = validation_stylevec3(StyleFilter, net, val_data_loader, device, save_path)
 
     return pred_image
 

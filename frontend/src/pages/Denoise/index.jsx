@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 const Denoise = () => {
   const [imageURL, setImageURL] = useState("");
   const [preview, setPreview] = useState(null);
-  const [file, setFile] = useState(null); // Thêm state lưu file
+  const [file, setFile] = useState(null); 
   const [fileURL, setFileURL] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef(null);
@@ -21,6 +21,25 @@ const Denoise = () => {
   }, [imageURL]);
 
   const handleFile = (file) => {
+    const supportedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+      "image/tiff",
+      "image/bmp"
+    ];
+
+    if (!supportedTypes.includes(file.type)) {
+      alert("Định dạng ảnh không được hỗ trợ. Vui lòng chọn ảnh định dạng JPEG, PNG, WEBP, GIF, TIFF hoặc BMP.");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Ảnh vượt quá dung lượng cho phép (10MB).");
+      return;
+    }
+
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result);
@@ -47,15 +66,15 @@ const Denoise = () => {
   };
 
 
-  const fetchImageAsFile = async (url) => {
-    const response = await fetch(url);
-    const blob = await response.blob();
+  // const fetchImageAsFile = async (url) => {
+  //   const response = await fetch(url);
+  //   const blob = await response.blob();
 
-    const ext = blob.type.split("/")[1] || "png";
-    const name = generateRandomFileName(ext);
+  //   const ext = blob.type.split("/")[1] || "png";
+  //   const name = generateRandomFileName(ext);
 
-    return new File([blob], name, { type: blob.type });
-  };
+  //   return new File([blob], name, { type: blob.type });
+  // };
 
 
   const generateRandomFileName = (ext = "png") => {
@@ -74,25 +93,22 @@ const Denoise = () => {
 
     try {
       if (!file && imageURL){
-        let fileToSend = file;
-        fileToSend = await fetchImageAsFile(imageURL);
         const formData = new FormData();
-        formData.append("file", fileToSend);
-        formData.append("filename", fileToSend.name);
+        formData.append("url", imageURL);
 
-        const response = await API.post("/denoise-image/", formData, {
+        const response = await API.post("/denoise-image-url/", formData, {
           headers: { "Content-Type": "multipart/form-data" },
           responseType: "json",
         });
 
         if (response.status === 200) {
-          const { image_base64 } = response.data;
+          const { image_base64, image_origin, name_image} = response.data;
 
           navigate("/result", {
             state: {
-              originalImage: URL.createObjectURL(fileToSend),
+              originalImage: `data:image/png;base64,${image_origin}`,
               resultImage: `data:image/png;base64,${image_base64}`,
-              fileName: fileToSend.name,
+              fileName: name_image || "image_from_url.png",
             },
           });
         }
@@ -122,8 +138,11 @@ const Denoise = () => {
       }
       
     } catch (error) {
-      console.error("Error sending image:", error);
-      alert("Failed to denoise image.");
+      if (err.response && err.response.data?.detail) {
+        alert(`Lỗi: ${err.response.data.detail}`);
+      } else {
+        alert("Lỗi không xác định khi xử lý ảnh.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -155,14 +174,13 @@ const Denoise = () => {
               </div>
             )}
 
-            {/* Nếu có preview thì hiển thị ảnh, che các phần còn lại */}
             {preview ? (
               <div className="relative w-full">
                 <button
                   onClick={() => {
                     setPreview(null);
                     setImageURL("");
-                    setFile(null); // Reset file khi xóa ảnh preview
+                    setFile(null); 
                   }}
                   className="absolute top-2 right-2 bg-white/70 hover:bg-red-500 text-gray-800 hover:text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg backdrop-blur transition z-10"
                   title="Remove Image"
