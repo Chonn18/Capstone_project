@@ -2,3 +2,7 @@
 * text=auto eol=lf
 
 /Backend/ModelAI/InvSR/weights 
+
+/Backend/draw.ipynb
+/Backend/runurl.ipynb
+/Backend/test.ipynb

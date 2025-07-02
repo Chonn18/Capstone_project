@@ -196,23 +196,3 @@ async def denoise_image_url(url: str = Form(...)):
     except Exception as e:
         return {"error": str(e)}
     
-# @app.post("/imageSR/")
-# async def SRimg(
-#     file: UploadFile = File(...),
-#     filename: str = Form(...)
-# ):
-#     try:
-#         # Mở và lưu ảnh với tên đã nhận
-#         image = Image.open(file.file)
-        
-
-#         # return {
-#         #     "message": "Image denoising completed successfully",
-#         #     "image_base64": img_str,
-#         # }
-
-#     except Exception as e:
-#         return {"error": str(e)}
-
-# uvicorn main:app --host 0.0.0.0 --port 8080
-# ngrok http 8080

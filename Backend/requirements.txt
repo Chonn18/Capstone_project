@@ -10,3 +10,5 @@ python-box
 omegaconf
 loguru
 einops
+fastapi
+uvicorn
